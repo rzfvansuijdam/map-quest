@@ -7,7 +7,9 @@ const myDescription = document.getElementById('description');
 const myInventory = document.getElementById('inventory');
 const treasure = document.getElementById('treasure');
 
-let currentLocation = 4;
+let currentLocation = 1;
+
+inventory = [];
 
 let locations = [];
 locations[0] = "kantine";
@@ -24,9 +26,10 @@ treasures = [];
 treasures[6] = "green dagger"
 treasures[5] = "key"
 
+
 treasureImages = [];
-treasureImages[6] = "green_dagger.png"
-treasures[5] = "key_treasure.png"
+treasureImages[6] = "media/green_dagger.png"
+treasureImages[5] = "media/key_treasure.png"
 
 
 images = [];
@@ -51,6 +54,7 @@ directions[6] = ["oost"];
 directions[7] = ["noord", "west", "oost"];
 directions[8] = ["noord", "west"];
 
+
 descriptions = [];
 descriptions[0] = "u staat in een kantine. Hier zitten studenten te eten of computerspelletjes te doen";
 descriptions[1] = "u staat op een trap naar de eerste etage. Om u heen lopen studenten omhoog en omlaag";
@@ -63,6 +67,7 @@ descriptions[7] = "u staat in een klaslokaal. De tafels staan recht achter elkaa
 descriptions[8] = "u staat in het examenlokaal. Hier zijn de vierdejaars studenten bezig met het voorbereiden van hun examen";
 
 myInput.addEventListener('keydown', getInput, false);
+
 
 function getInput(evt) {
   if (evt.key == "Enter") {
@@ -89,53 +94,69 @@ function getInput(evt) {
         setTimeout(removeFeedback, 2000);
 
       }
-      giveLocation();
+      giveLocationInformatie();
+      checkForTreasure();
       myInput.value = "";
     }
 
     if (inputArray[0] == "pak") {
       console.log('ga wat pakken');
       myInput.value = "";
+      if (treasures[currentLocation] != null && treasures[currentLocation] != undefined) {
+        console.log('schat gepakt');
+        pakTreasure(currentLocation);
+        giveLocationInformatie();
+      }
     }
-
-    if (inputArray[0] == "gebruik"){
-      console.log('ga wat gebruiken');
-      myInput.value = "";
-    }
-
-    if (inputArray[0] != "ga" && inputArray[0] != "pak" && inputArray[0] != "gebruik" ){
-      feedback.innerHTML = "mogelijke commando's zijn: ga, pak, gebruik en help";
-      myInput.value = "";
-      setTimeout(removeFeedback, 4000);
-    }
-
-
   }
 }
-
-function giveLocation() {
-  divLocation.innerHTML = locations[currentLocation] + " => grid " + currentLocation;
+giveLocationInformatie();
+function giveLocationInformatie() {
+  divLocation.innerHTML = locations[currentLocation] + " => grid: " + currentLocation;
   myDescription.innerHTML = descriptions[currentLocation];
   imageLocation.src = "media/" + images[currentLocation];
-  myDirections = "mogelijke richtingen zijn: ";
-  for (let i = 0; i < directions[currentLocation].length; i++) {
-    myDirections += "<li>" + directions[currentLocation][i] + "</li>";
-  }
-  myPossibilities.innerHTML = myDirections;
-  myInventory.innerHTML = "uw inventory is leeg";
-   showTreasure(currentLocation);{
-   if(typeof treasures[currentLocation] !="undefined");
-    console.log(treasures[currentLocation]);
-    treasure.src = "treasures/" + treasureImages[currentLocation];
+    let myDirections = "mogelijke richtingen zijn: ";
+    for (let i = 0; i < directions[currentLocation].length; i++) {
+      myDirections += "<li>" + directions[currentLocation][i] + "</li>";
     }
+    myPossibilities.innerHTML = myDirections;
+    myInventory.innerHTML = "uw inventory is leeg";
+    showInventory();
 }
+
+function showInventory(){
+  let items = "";
+  if(inventory.length <= 0){
+    myInventory.innerHTML = "leeg";
+    return;
+  }
+  for(let i = 0; i < inventory.length; i++){
+    items += "<li>" + inventory[i] + "</li>";
+  }
+  myInventory.innerHTML = items;
+}
+
 
 function removeFeedback() {
   feedback.innerHTML = "";
 }
- function showTreasure(currentLocation){
-   if(typeof treasures[currentLocation] !="undefined");
-    console.log(treasures[currentLocation]);
-    treasure.src = "media/" +treasureImages[currentLocation];
-    }
-giveLocation();
+
+checkForTreasure();
+
+function checkForTreasure() {
+  console.log(treasures[currentLocation]);
+  if (treasures[currentLocation] != null && treasures[currentLocation] != undefined) {
+    treasure.src = treasureImages[currentLocation];
+    return;
+  }
+  treasure.src = "";
+  }
+
+
+  function pakTreasure(currentLocation) {
+    inventory.push(treasures[currentLocation])
+    treasures[currentLocation] = "";
+      treasureImages  [currentLocation] = "";
+    giveLocationInformatie();
+    checkForTreasure();
+  }
